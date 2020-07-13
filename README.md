@@ -42,3 +42,14 @@ and in your `$HOME/.config/git/config` add
 ```
 You may also want a wrapper script/shell function `diffu` to do `diff -u
 "$@"|hldiff` or similar.
+
+You will also want to `cp example.cf $HOME/.config/hldiff` and edit it to your
+liking.  ANSI SGR escape names are the usual suspects from cligen/humanUt:
+```
+plain, bold, italic, underline, blink, inverse, struck, NONE,
+black, red, green, yellow, blue, purple, cyan, white;
+UPPERCASE =>HIGH intensity; "on_" prefix => BACKGROUND color
+256-color xterm attrs are [fb][0..23] for FORE/BACKgrnd grey scale & [fb]RGB
+a 6x6x6 color cube; each [RGB] is on [0,5].
+xterm/st true colors are [fb]HHHHHH (usual R,G,B mapping).
+```
