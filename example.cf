@@ -1,0 +1,16 @@
+# This is an example $HOME/.config/hldiff using a bunch of LC\_THEME-switched
+# color aliases I set up in my `$HOME/.config/cligen/`.  hue0-5 are purple->red
+# in rainbow order; +- are positive/negative polarity w/respect to BG color.
+# Since I use bright green as my default FG with black, "pgreen" maps to "WHITE"
+# on darkBG and to "green" on lightBG.
+color = "regular             plain"
+color = "commit-header-name  fhue1"
+color = "commit-header-value fhue0"
+color = "commit-message      fhue2"
+color = "diff-header         fhue4"
+color = "hunk-header         fhue2"
+color = "equal               NONE"
+color = "deleted             fhue5"
+color = "deleted-emph        bhue5 FHUE-"
+color = "inserted            pgreen italic"
+color = "inserted-emph       bhue3 italic FHUE-"
