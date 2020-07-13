@@ -3,7 +3,8 @@ version     = "0.1"
 author      = "Charles Blake"
 description = "A highlighter for diff -u-like output & port of Python difflib"
 license     = "MIT/ISC"
-bin         = @[ "hldiff" ]
+srcDir      = "src"
+bin         = @[ "hldiff", "edits" ]
 
 # Dependencies
-requires "nim > 0.20.1", "cligen#head"
+requires "nim >= 0.20.2", "cligen#head"

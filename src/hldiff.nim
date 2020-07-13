@@ -1,4 +1,4 @@
-import strutils, os, sets, tables, hldiffpkg/edits,
+import strutils, os, sets, tables, ./edits,
        cligen/[parseopt3, osUt, textUt, humanUt]
 var
   highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
