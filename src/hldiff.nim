@@ -2,17 +2,17 @@ import strutils, os, sets, tables, ./edits,
        cligen/[parseopt3, osUt, textUt, humanUt]
 var
   highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
-    "regular"           : "plain"    ,
-    "commitheadername"  : "blue"     ,
-    "commitheadervalue" : "green"    ,
-    "commitmessage"     : "white"    ,
-    "diffheader"        : "yellow"   ,
-    "hunkheader"        : "white"    ,
-    "equal"             : "NONE"     ,
-    "deleted"           : "red"      ,
-    "deletedemph"       : "red bold" ,
-    "inserted"          : "cyan"     ,
-    "insertedemph"      : "cyan bold" }.toTable
+    "regular"           : "plain"      ,
+    "commitheadername"  : "blue"       ,
+    "commitheadervalue" : "purple"     ,
+    "commitmessage"     : "cyan"       ,
+    "diffheader"        : "yellow"     ,
+    "hunkheader"        : "white"      ,
+    "equal"             : "NONE"       ,
+    "deleted"           : "red"        ,
+    "deletedemph"       : "red inverse",
+    "inserted"          : "green"      ,
+    "insertedemph"      : "green inverse" }.toTable
   attr: Table[string, string]   # Above table realized post-start up/parseColor
   hlReg, hlCommitHdNm, hlCommitHdVal, hlCommitMsg, hlDiffHdr, hlHunkHdr,
     hlEql, hlDel, hlDelEmph, hlIns, hlInsEmph: string #No-lookup access to above
