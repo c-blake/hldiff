@@ -33,8 +33,9 @@ https://github.com/da-x/delta program which crashes immediately for me on a
 Linux kernel `git log -p`. { `delta` does (or tries to do) more work to syntax
 highlight the text on a per prog.lang basis. } I've not timed various `git diff
 --word-diff-regex` configs, but regexes get awfully slow and git does not go
-multi-threaded for highlighting purposes.  So, `hldiff` may be the only way to
-highlight diff output that does not make users wait longer on already slow jobs.
+multi-threaded for highlighting purposes.  So, `hldiff` may be the only way (at
+present) to highlight diff output that does not make users wait longer on already
+slow jobs.
 
 Intallation
 ===========
