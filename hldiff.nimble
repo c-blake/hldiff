@@ -1,7 +1,7 @@
 # Package
 version     = "0.1"
 author      = "Charles Blake"
-description = "A port of Python difflib to (re)highlight diff output intraline"
+description = "A port of Python difflib to compute & (re)highlight diff output intraline"
 license     = "MIT/ISC"
 srcDir      = "src"
 bin         = @[ "hldiff", "edits" ]
