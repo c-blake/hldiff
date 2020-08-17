@@ -19,7 +19,7 @@ proc `<`(x, y: Same): bool {.inline.} = x.st.a < y.st.a or x.st.b < y.st.b
 
 proc initCmper*[T](s, t: openArray[T];
                    junk: HashSet[T] = initHashSet[T]()): Cmper[T] =
-  ## Make a new `Cmper` & compute some metadata.  `junk` cannot start a Same.
+  ## Make a new `Cmper` & compute some metadata.  `junk` cannot start a `Same`.
   ## `s` is not used, but required/accepted for consistency with other calls.
   result.junk = junk
   result.b2js = initTable[T, seq[int]]()
