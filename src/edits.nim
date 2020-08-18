@@ -136,17 +136,17 @@ proc autojunk*[T](s: openArray[T], ajDiv=0): seq[T] =
   for e, n in pairs(s.count):
     if n >= thresh: result.add e
 
-proc simil*(sames: seq[Same]): int =
+proc similarity*(sames: seq[Same]): int =
   ## Return a similarity score with max value = `s.len + t.len`.
   for m in sames: result += m.n
 
-proc simil*[T](s, t: openArray[T]; junk: HashSet[T] = initHashSet[T]()): int =
+proc similarity*[T](s,t: openArray[T]; junk: HashSet[T]=initHashSet[T]()): int =
   ## Return a similarity score with max value = `s.len + t.len`.
   var c = initCmper[T](s, t, junk)
-  c.sames(s, t).simil
+  c.sames(s, t).similarity
 
 proc similUB1*[T](s, t: openArray[T]): int =
-  ## Return cardinality(multiset-intersection), an easy upper bound of `simil`.
+  ## Return cardinality(multiset-intersection), a fast `similarity` upper bound.
   let tCnt = t.count
   var avail: Table[T, int]  # Times `e` appears in `t` minus seen so far in `s`
   for e in s:
@@ -154,15 +154,15 @@ proc similUB1*[T](s, t: openArray[T]): int =
     avail[e] = n - 1
     if n > 0: result.inc
 
-proc closeTo*(e: string, s: seq[string], n=3, pct=59): seq[string] =
-  ## Return up to `n` members of `s` "close to" (`simil > pct/100`) `e` with the
-  ## closest first. `"appel".closeTo(@["ape","apple","pot"])==@["apple","ape"]`
+proc closeTo*(e: string, s: seq[string], n=3, percent=59): seq[string] =
+  ##Return up to `n` members of `s` "close to" (`similarity > percent/100`) `e`,
+  ##closest first.  `"appel".closeTo(@["ape","apple","pot"])==@["apple","ape"]`
   var hq = initHeapQueue[tuple[score: int; str: string]]()
-  let m  = pct * (s.len + 1) div 100            # min score to include
+  let m  = percent * (s.len + 1) div 100        # min score to include
   var c  = initCmper("", e)                     # Arg1 doesn't matter;Arg2 const
   for x in s:
     if min(x.len, e.len) > m and similUB1(x, e) > m: # check upper bounds first
-      if (let r = c.sames(x, e).simil; r) > m:  # then expensive similarity
+      if (let r = c.sames(x, e).similarity; r) > m:  # then expensive similarity
         let z = (r, x)                          # above thresh->bnded HeapQueue
         if hq.len < n : hq.push z
         elif z > hq[0]: discard hq.replace(z)

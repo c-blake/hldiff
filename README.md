@@ -8,8 +8,8 @@ is, in turn, used to build an engine to (re)highlight intraline the output of
 Configuration of colorization is similar to
 [cligen](https://github.com/c-blake/cligen)/[lc](https://github.com/c-blake/lc)/[procs](https://github.com/c-blake/procs)
 using the same internal engine.  `edits` also provides/exports an edit distance
-based on the edit algorithm (from Ratcliff1988), though here called `simil` for
-"similarity" and a common-needs API `closeTo` that gives "nearby suggestions".
+based on the edit algorithm (from Ratcliff1988), here called `similarity` and a
+common-needs API `closeTo` that gives "nearby suggestions" for Nim `string`s.
 
 Motivation
 ==========
