@@ -90,7 +90,7 @@ proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
       let sMx = gI.len + gJ.len                   # check upper bounds first
       if min(gI.len, gJ.len)*100 > th * sMx and similUB1(gI, gJ)*100 > th * sMx:
         let ss  = c.sames(gI, gJ)                 # ss = CHAR-BY-CHAR DIFF
-        let sim = ss.simil * 10_000 div sMx
+        let sim = ss.similarity * 10_000 div sMx
         if sim > 100 * th and sim > pairJ.sim:
           pairJ.i   = i
           pairJ.sim = sim
