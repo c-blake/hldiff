@@ -1,9 +1,10 @@
 # Package
-version     = "0.1"
+version     = "0.2"
 author      = "Charles Blake"
 description = "A port of Python difflib to compute & (re)highlight diff output intraline"
 license     = "MIT/ISC"
 srcDir      = "src"
+installExt  = @[ "nim" ]
 bin         = @[ "hldiff", "edits" ]
 
 # Dependencies
