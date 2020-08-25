@@ -1,11 +1,11 @@
 Overview
 ========
 This package is a port of Python's `difflib` algorithms to compute edits, diffs,
-patches on pairs of `seq[T]` (lines, chars, etc.) in `src/edits.nim`.  A full
-example re-implementation of `diff -u` for lines ends `src/edits.nim`.  `edits`
-is, in turn, used to build an engine to (re)highlight intraline the output of
-`diff -u`, `git diff`, or `hg diff` with user-customizable ANSI/SGR escapes.
-Configuration of colorization is similar to
+patches on pairs of `seq[T]` (lines, chars, etc.) in `hldiffpkg/edits.nim`.
+An example re-implementation of `diff -u` for lines ends `hldiffpkg/edits.nim`.
+`edits` is, in turn, used to build an engine to (re)highlight intraline the
+output of `diff -u`, `git diff`, or `hg diff` with user-customizable ANSI/SGR
+escapes.  Configuration of colorization is similar to
 [cligen](https://github.com/c-blake/cligen)/[lc](https://github.com/c-blake/lc)/[procs](https://github.com/c-blake/procs)
 using the same internal engine.  `edits` also provides/exports an edit distance
 based on the edit algorithm (from Ratcliff1988), here called `similarity` and a
