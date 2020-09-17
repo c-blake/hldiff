@@ -100,6 +100,7 @@ iterator edits*[T](s,t: openArray[T]; junk: HashSet[T]=initHashSet[T]()): Edit =
 
 proc grouped*(ss: seq[Same], n=3): seq[seq[Edit]] =
   ## Yield groups of edits with up to `n` lines of context; Usable for unidiffs.
+  let n = max(0, n - 1)
   var all, grp: seq[Edit]
   for ed in edits(ss): all.add(ed)                  # collect all edits
   if all.len == 0:                                  # fix empty seq
@@ -190,7 +191,7 @@ when isMainModule:
     let t = paths[1].lines
     let jnk = toHashSet(if junk.len > 0: junk.lines else: autojunk(t, ajDiv))
     var begun = false
-    for eds in grouped(sames(s, t, jnk), n - 1):
+    for eds in grouped(sames(s, t, jnk), n):
       if not begun:
         begun = true
         const tf = "yyyy-MM-dd HH:mm:ss zzz" # nim times bug .fff => '.' invalid
