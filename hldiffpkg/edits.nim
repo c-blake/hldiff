@@ -190,14 +190,14 @@ when isMainModule:
     let t = paths[1].lines
     let jnk = toHashSet(if junk.len > 0: junk.lines else: autojunk(t, ajDiv))
     var begun = false
-    for eds in grouped(sames(s, t, jnk), n):
+    for eds in grouped(sames(s, t, jnk), n - 1):
       if not begun:
         begun = true
         const tf = "yyyy-MM-dd HH:mm:ss zzz" # nim times bug .fff => '.' invalid
         echo "--- ", paths[0], '\t', paths[0].getLastModificationTime.format(tf)
         echo "+++ ", paths[1], '\t', paths[1].getLastModificationTime.format(tf)
-      echo "@@ -", rangeUni(eds[0].s.a, eds[^1].s.b),
-           " +"  , rangeUni(eds[0].t.a, eds[^1].t.b), " @@"
+      echo "@@ -", rangeUni(eds[0].s.a, eds[^1].s.b+1),
+           " +"  , rangeUni(eds[0].t.a, eds[^1].t.b+1), " @@"
       for ed in eds:
         case ed.ek
         of ekEql: (for ln in s[ed.s]: echo " ", ln)
