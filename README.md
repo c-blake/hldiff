@@ -39,8 +39,8 @@ multi-threaded for highlighting purposes.  So, `hldiff` may be the only way (at
 present) to highlight diff output that does not make users wait longer on already
 slow jobs.
 
-Intallation
-===========
+Installation
+============
 If you want to use it, what you need is to first compile it (`git clone cligen`
 + `git clone this`, then `nim c --path:to/cligen -d:danger hldiff` or `nimble
 install --passNim:-d:danger hldiff`).  Then to `$HOME/.config/hg/hgrc` add
