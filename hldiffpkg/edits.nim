@@ -206,6 +206,7 @@ when isMainModule:
         of ekSub:
           for ln in s[ed.s]: echo "-", ln
           for ln in t[ed.t]: echo "+", ln
+    result = if begun: 1 else: 0
 
   dispatch(diffu, cmdName="diffu", help = {
              "junk"  : "Use lines in this file to apply Py difflib heuristic",
