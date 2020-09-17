@@ -81,9 +81,9 @@ iterator edits*(sames: seq[Same]): Edit =
   ## Yield edits needed to transform `seq s` into `t`, given `sames`.
   var i, j: int
   for m in sames:                               # Classify edits & yield
-    let ek = if i < m.st.a and j < m.st.b: ekSub elif i < m.st.a: ekDel
-             elif j < m.st.b: ekIns else: ekEql
-    yield (ek, i ..< m.st.a, j ..< m.st.b)
+    if i < m.st.a and j < m.st.b: yield (ekSub, i ..< m.st.a, j ..< m.st.b)
+    elif i < m.st.a:              yield (ekDel, i ..< m.st.a, j ..< m.st.b)
+    elif j < m.st.b:              yield (ekIns, i ..< m.st.a, j ..< m.st.b)
     i = m.eoa; j = m.eob
     if m.n != 0: yield (ekEql, m.st.a ..< i, m.st.b ..< j)
 
