@@ -212,7 +212,7 @@ when isMainModule:
       of pkDiffHd:   lns.rendDiffHd
       of pkDiffHunk: lns.rendDiffHunk
 
-  dispatch(hldiff, cmdName="hldiff", help = {  #XXX figure out eliding cmdName=
+  dispatch(hldiff, help = {
              "colors"      : "color aliases; Syntax: name = ATTR1 ATTR2..",
              "color"       : "text attrs for syntax elts; Like lc/etc.",
              "plain"       : "turn off ANSI SGR escape colorization",
