@@ -70,7 +70,7 @@ proc sames*[T](c: var Cmper[T]; s, t: openArray[T]): seq[Same] =
   var m1: Same                                  # init to dummy
   for m2 in blocks:                             # Merge adjacent equal blocks
     if m1.eoa == m2.st.a and m1.eob == m2.st.b: # Adjacent; merge
-      m1.n += m2.n
+      m1.n += m2.n                              # Extend m1 by length of m2
     else:
       if m1.n != 0: result.add m1               # 1st in result if not dummy
       m1 = m2
@@ -101,7 +101,7 @@ iterator edits*[T](s,t: openArray[T]; junk: HashSet[T]=initHashSet[T]()): Edit =
 proc grouped*(ss: seq[Same], n=3): seq[seq[Edit]] =
   ## Yield groups of edits with up to `n` lines of context; Usable for unidiffs.
   var all, grp: seq[Edit]
-  for ed in edits(ss): all.add(ed)                  # collect edits
+  for ed in edits(ss): all.add(ed)                  # collect all edits
   if all.len == 0:                                  # fix empty seq
     all.add (ekEql, 0..<1, 0..<1)
   if all[0].ek == ekEql:                            # fix leading if no diff
