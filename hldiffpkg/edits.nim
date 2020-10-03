@@ -2,7 +2,7 @@
 ## Algorithm is Python's `difflib.SequenceMatcher` follow-on to Ratcliff1988's
 ## edit distance with run time ~ `[o(n), O(n^2)]` where `n = max(s.len, t.len)`.
 
-import tables, algorithm, sets, sequtils, heapqueue
+import std/[tables, algorithm, sets, sequtils, heapqueue]
 
 type
   EdKind* = enum ekEql, ekDel, ekIns, ekSub
