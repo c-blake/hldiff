@@ -112,15 +112,15 @@ proc grouped*(ss: seq[Same], n=3): seq[seq[Edit]] =
     all[^1].s.b = min(all[^1].s.b, all[^1].s.a + n)
     all[^1].t.b = min(all[^1].t.b, all[^1].t.a + n)
   for ed in all:
+    var e = ed
     if ed.ek == ekEql and ed.s.b - ed.s.a > 2*n:    # big range w/no diff
       grp.add (ekEql, ed.s.a ..< min(ed.s.b, ed.s.a + n),
                       ed.t.a ..< min(ed.t.b, ed.t.a + n))
       result.add grp                                # end current & start new
       grp.setLen 0
-      grp.add (ekEql, ed.s.a ..< max(ed.s.a, ed.s.b - n),
-                      ed.t.a ..< max(ed.t.a, ed.t.b - n))
-    else:                                           # just accumulate
-      grp.add ed
+      e.s.a = max(ed.s.a, ed.s.b - n)
+      e.t.a = max(ed.t.a, ed.t.b - n)
+    grp.add e
   if grp.len > 0 and not (grp.len == 1 and grp[0].ek == ekEql):
     result.add grp
 
