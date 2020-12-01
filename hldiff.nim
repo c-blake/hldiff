@@ -175,18 +175,18 @@ proc rendDiffHunk(lines: seq[string]) =
        (c == '+' and state in {ekIns, ekSub}):  # any->self: accumulate
       group.add lines[i]
     elif c in sb:                               # any->eql
-      group.render state, nDel
+      group.render state, nDel; nDel = 0
       group = @[ lines[i] ]
       state = ekEql
     elif state == ekEql and (c=='-' or c=='+'): # eql->(del|ins)
-      group.render state, nDel
+      group.render state, nDel; nDel = 0
       group = @[ lines[i] ]
       state = if c == '-': ekDel else: ekIns
     elif state == ekDel and c == '+':           # del->sub
       nDel = group.len
       group.add lines[i]
       state = ekSub
-  group.render state, 0
+  group.render state, nDel
 
 when isMainModule:
   import cligen, cligen/osUt; include cligen/mergeCfgEnv
