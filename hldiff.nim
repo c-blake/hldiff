@@ -16,10 +16,10 @@ var
   attr: Table[string, string]   # Above table realized post-start up/parseColor
   hlReg, hlCommitHdNm, hlCommitHdVal, hlCommitMsg, hlDiffHdr, hlHunkHdr,
     hlEql, hlDel, hlDelEmph, hlIns, hlInsEmph: string #No-lookup access to above
-  dhl     = false               # Highlight diff header ---/+++ lines like edits
-  thresh  = 30                  # Similarity threshold to do char-by-char diff
-  junkDf  = false               # Use Python difflib-like junk heuristic
-  bskip   = 20                  # Do not char-by-char block pairs > lim*lim
+  dhl    = false                # Highlight diff header ---/+++ lines like edits
+  thresh = 30                   # Similarity threshold to do char-by-char diff
+  junkDf = false                # Use Python difflib-like junk heuristic
+  bskip  = 20                   # Do not char-by-char block pairs > lim*lim
 
 proc emit*(a: varargs[string, `$`]) {.inline.} = stdout.urite(a)
 
