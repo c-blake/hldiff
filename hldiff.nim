@@ -74,8 +74,10 @@ proc rendDiffHd(lines: seq[string]) =
 const charJunk  = @[ ' ', '\t' ].toHashSet
 const junkEmpty = initHashSet[char]()
 proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
-  if nDel * (group.len - nDel) > lim * lim:       # CHAR-BY-CHAR slow & useless
-    for i in 0 ..< nDel: emit hlDel, group[i], hlReg, '\n' #..for big blockPairs
+  var mx = 0
+  for line in group: mx = max(mx, line.len)
+  if mx > 300*lim or nDel * (group.len - nDel) > lim*lim:  # CHAR-BY-CHAR slow &
+    for i in 0 ..< nDel: emit hlDel, group[i], hlReg, '\n' #..useless for giants
     for j in nDel ..< group.len: emit hlIns, group[j], hlReg, '\n'
     return
   type Pair = tuple[i, sim: int; ss: seq[Same]]
