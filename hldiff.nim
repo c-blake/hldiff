@@ -21,7 +21,7 @@ var
   junkDf = false                # Use Python difflib-like junk heuristic
   bskip  = 20                   # Do not char-by-char block pairs > lim*lim
 
-proc emit*(a: varargs[string, `$`]) {.inline.} = stdout.urite(a)
+proc emit(a: varargs[string, `$`]) {.inline.} = stdout.urite(a)
 
 proc parseColor(color: seq[string], plain=false) =
   let plain = plain or existsEnv("NO_COLOR")
