@@ -75,22 +75,23 @@ proc rendDiffHd() =
 
 const charJunk  = @[ ' ', '\t' ].toHashSet
 const junkEmpty = initHashSet[char]()
-proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
+proc rendSub(a, b: int; nDel: int, th=thresh, junk=junkDf, lim=bskip) =
+  let n = b + 1 - a
   var mx = 0
-  for line in group: mx = max(mx, line.len)
-  if mx > 300*lim or nDel * (group.len - nDel) > lim*lim:  # CHAR-BY-CHAR slow &
-    for i in 0 ..< nDel: emit hlDel, group[i], hlReg, '\n' #..useless for giants
-    for j in nDel ..< group.len: emit hlIns, group[j], hlReg, '\n'
+  for i in a..b: mx = max(mx, pt[i].len)
+  if mx > 300*lim or nDel * (n - nDel) > lim*lim:          # CHAR-BY-CHAR slow &
+    for i in 0 ..< nDel: emit hlDel, pt[a+i], hlReg, '\n' #..useless for giants
+    for j in nDel ..< n: emit hlIns, pt[a+j], hlReg, '\n'
     return
   type Pair = tuple[i, sim: int; ss: seq[Same]]
   var pairs = initTable[int, Pair](tables.rightSize(nDel))
   var sims  = initTable[int, tuple[sim, j: int]](tables.rightSize(nDel))
-  for j in nDel ..< group.len:                    # FIRST PAIR "CLOSE" LINES
-    let gJ = group[j][1..^1]
+  for j in nDel ..< n:                            # FIRST PAIR "CLOSE" LINES
+    let gJ = pt[a+j][1..^1]
     var c = initCmper("", gJ, if junk: charJunk else: junkEmpty)
     var pairJ: Pair
     for i in 0 ..< nDel:                          # pairJ -> most similar i
-      let gI  = group[i][1..^1]
+      let gI  = pt[a+i][1..^1]
       let sMx = gI.len + gJ.len                   # check upper bounds first
       if min(gI.len, gJ.len)*100 > th * sMx and similUB1(gI, gJ)*100 > th * sMx:
         let ss  = c.sames(gI, gJ)                 # ss = CHAR-BY-CHAR DIFF
@@ -104,7 +105,7 @@ proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
       pairs[j] = move(pairJ)
   for i in 0 ..< nDel:
     if i in sims and sims[i].j in pairs:          # CHAR-BY-CHAR DIFF => HILITE
-      let j = sims[i].j; let gI = group[i][1..^1] # let gJ = group[j][1..^1]
+      let j = sims[i].j; let gI = pt[a+i][1..^1]  # let gJ = pt[a+j][1..^1]
       emit hlDel, '-', hlReg
       for ed in edits(pairs[j].ss):
         case ed.ek
@@ -113,10 +114,10 @@ proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
         else: discard
       emit '\n'
     else:
-      emit hlDel, group[i], hlReg, '\n'
-  for j in nDel ..< group.len:
+      emit hlDel, pt[a+i], hlReg, '\n'
+  for j in nDel ..< n:
     if j in pairs:                                # CHAR-BY-CHAR DIFF => HILITE
-      let p = pairs[j]; let gJ = group[j][1..^1]
+      let p = pairs[j]; let gJ = pt[a+j][1..^1]
       emit hlIns, '+', hlReg
       for ed in edits(p.ss):
         case ed.ek
@@ -125,15 +126,15 @@ proc rendSub(group: seq[string], nDel: int, th=thresh, junk=junkDf, lim=bskip) =
         else: discard
       emit '\n'
     else:
-      emit hlIns, group[j], hlReg, '\n'
+      emit hlIns, pt[a+j], hlReg, '\n'
 
-proc render(group: seq[string], ek: EdKind, nDel: int) {.inline.} =
-  if group.len < 1: return
+proc render(a, b: int; ek: EdKind, nDel: int) {.inline.} =
+  if b < a: return
   case ek
-  of ekEql: (for ln in group: emit hlEql, ln, hlReg, '\n')
-  of ekDel: (for ln in group: emit hlDel, ln, hlReg, '\n')
-  of ekIns: (for ln in group: emit hlIns, ln, hlReg, '\n')
-  of ekSub: group.rendSub(nDel)
+  of ekEql: (for i in a..b: emit hlEql, pt[i], hlReg, '\n')
+  of ekDel: (for i in a..b: emit hlDel, pt[i], hlReg, '\n')
+  of ekIns: (for i in a..b: emit hlIns, pt[i], hlReg, '\n')
+  of ekSub: rendSub a, b, nDel
 
 type PartKind = enum pkCommitHd, pkDiffHd, pkDiffHunk
 
@@ -166,9 +167,9 @@ iterator stdinParts(): PartKind =
 const sb = { ' ', '\\' }  # Mercurial emits "^\ No newline at end of file"
 proc rendDiffHunk() =
   ## Fancy intra-line diff highlighting of edit hunks.
-  emit hlHunkHdr, pt[0], hlReg, '\n' # render "@@" hunk header line.
+  emit hlHunkHdr, pt[0], hlReg, '\n'    # render "@@" hunk header line.
   var state = ekEql
-  var group: seq[string]
+  var a = 1; var b = 0
   var nDel = 0
   for i in 1 ..< pt.len:
     if pt[i].len < 1:
@@ -176,20 +177,20 @@ proc rendDiffHunk() =
     let c = pt[i][0]
     if (state == ekEql and c in sb) or (state == ekDel and c == '-') or
        (c == '+' and state in {ekIns, ekSub}):  # any->self: accumulate
-      group.add pt[i]
+      b = i
     elif c in sb:                               # any->eql
-      group.render state, nDel; nDel = 0
-      group = @[ pt[i] ]
+      render a, b, state, nDel; nDel = 0
+      a = i; b = a
       state = ekEql
     elif state == ekEql and (c=='-' or c=='+'): # eql->(del|ins)
-      group.render state, nDel; nDel = 0
-      group = @[ pt[i] ]
+      render a, b, state, nDel; nDel = 0
+      a = i; b = a
       state = if c == '-': ekDel else: ekIns
     elif state == ekDel and c == '+':           # del->sub
-      nDel = group.len
-      group.add pt[i]
+      nDel = b + 1 - a
+      b = i
       state = ekSub
-  group.render state, nDel
+  render a, b, state, nDel
 
 when isMainModule:
   import cligen; include cligen/mergeCfgEnv
