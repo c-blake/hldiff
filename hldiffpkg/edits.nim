@@ -17,14 +17,21 @@ proc eoa(x: Same): int {.inline.} = x.st.a + x.n # A few Same utility procs
 proc eob(x: Same): int {.inline.} = x.st.b + x.n # End Of A|B & comparison.
 proc `<`(x, y: Same): bool {.inline.} = x.st.a < y.st.a or x.st.b < y.st.b
 
+proc init*[T](c: var Cmper[T]; s, t: openArray[T];
+              junk: HashSet[T] = initHashSet[T]()) =
+  ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is not used, but present
+  ## for consistency with other calls.
+  const empty: seq[int] = @[]
+  c.junk = junk
+  c.b2js = initTable[T, seq[int]](tables.rightSize(t.len))
+  for j, key in t:                              # chain `t`
+    if key notin junk: c.b2js.mgetOrPut(key, empty).add j
+
 proc initCmper*[T](s, t: openArray[T];
                    junk: HashSet[T] = initHashSet[T]()): Cmper[T] =
   ## Make a new `Cmper` & compute some metadata.  `junk` cannot start a `Same`.
-  ## `s` is not used, but required/accepted for consistency with other calls.
-  result.junk = junk
-  result.b2js = initTable[T, seq[int]]()
-  for j, key in t:                              # chain `t`
-    if key notin junk: result.b2js.mgetOrPut(key, @[]).add j
+  ## `s` is not used, but present for consistency with other calls.
+  result.init(s, t, junk)
 
 proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int]): Same =
   # Return longest common subseq between the two seqs, within given s/t slices.
