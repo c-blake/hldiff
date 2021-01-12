@@ -19,7 +19,7 @@ var
   dhl    = false                # Highlight diff header ---/+++ lines like edits
   thresh = 30                   # Similarity threshold to do char-by-char diff
   junkDf = false                # Use Python difflib-like junk heuristic
-  bskip  = 20                   # Do not char-by-char block pairs > lim*lim
+  bskip  = 20                   # Do not char-by-char block pairs > bskip*bskip
 
 var pt: seq[string]             # Current (p)ar(t)/section being highlighted
 
@@ -75,11 +75,11 @@ proc rendDiffHd() =
 
 const charJunk  = @[ ' ', '\t' ].toHashSet
 const junkEmpty = initHashSet[char]()
-proc rendSub(a, b: int; nDel: int, th=thresh, junk=junkDf, lim=bskip) =
+proc rendSub(a, b: int; nDel: int, th=thresh) =
   let n = b + 1 - a
   var mx = 0
   for i in a..b: mx = max(mx, pt[i].len)
-  if mx > 300*lim or nDel * (n - nDel) > lim*lim:          # CHAR-BY-CHAR slow &
+  if mx > 300*bskip or nDel*(n - nDel) > bskip*bskip:     # CHAR-BY-CHAR slow &
     for i in 0 ..< nDel: emit hlDel, pt[a+i], hlReg, '\n' #..useless for giants
     for j in nDel ..< n: emit hlIns, pt[a+j], hlReg, '\n'
     return
@@ -88,7 +88,7 @@ proc rendSub(a, b: int; nDel: int, th=thresh, junk=junkDf, lim=bskip) =
   var sims  = initTable[int, tuple[sim, j: int]](tables.rightSize(nDel))
   for j in nDel ..< n:                            # FIRST PAIR "CLOSE" LINES
     let gJ = pt[a+j][1..^1]
-    var c = initCmper("", gJ, if junk: charJunk else: junkEmpty)
+    var c = initCmper("", gJ, if junkDf: charJunk else: junkEmpty)
     var pairJ: Pair
     for i in 0 ..< nDel:                          # pairJ -> most similar i
       let gI  = pt[a+i][1..^1]
