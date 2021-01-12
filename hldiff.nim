@@ -21,6 +21,8 @@ var
   junkDf = false                # Use Python difflib-like junk heuristic
   bskip  = 20                   # Do not char-by-char block pairs > lim*lim
 
+var pt: seq[string]             # Current (p)ar(t)/section being highlighted
+
 proc emit(a: varargs[string, `$`]) {.inline.} = stdout.urite(a)
 
 proc parseColor(color: seq[string], plain=false) =
@@ -56,8 +58,8 @@ proc isHeader(ln: string): bool {.inline.} =    # Check [A-Za-z]+:<WHITESPC>
     if c in Whitespace: return sawLetter and sawColon
     return false
 
-proc rendCommitHd(lines: seq[string]) =
-  for ln in lines:
+proc rendCommitHd() =
+  for ln in pt:
     if ln.startsWith("commit ") or ln.isHeader:
       let ix = ln.find(Whitespace)
       emit hlCommitHdNm , ln[0..<ix], hlReg
@@ -65,8 +67,8 @@ proc rendCommitHd(lines: seq[string]) =
     else:
       emit hlCommitMsg, ln, hlReg, '\n'
 
-proc rendDiffHd(lines: seq[string]) =
-  for ln in lines:
+proc rendDiffHd() =
+  for ln in pt:
     if   dhl and ln.len > 0 and ln[0] == '-': emit hlDel, ln, hlReg, '\n'
     elif dhl and ln.len > 0 and ln[0] == '+': emit hlIns, ln, hlReg, '\n'
     else: emit hlDiffHdr, ln, hlReg, '\n'
@@ -135,63 +137,62 @@ proc render(group: seq[string], ek: EdKind, nDel: int) {.inline.} =
 
 type PartKind = enum pkCommitHd, pkDiffHd, pkDiffHunk
 
-iterator parts(lines: iterator():string): tuple[pk:PartKind, lns:seq[string]] =
+iterator stdinParts(): PartKind =
   ## A fast, one-pass iterator to classify input lines into blocks.  Note that
   ## an empty ``pkCommitHd`` occurs @start|end of ``diff -ru``|mercurial inputs.
-  var res: seq[string]
   var state = pkCommitHd
-  for raw in lines():
-    let line = raw.stripSGR
-    if state == pkDiffHd and line.startsWith("+++"):
-      res.add line
-      yield (state, res)
-      res.setLen 0
+  for raw in stdin.lines:               #NOTE: this strips either \r\n or \n
+    let ln = raw.stripSGR
+    if state == pkDiffHd and ln.startsWith("+++"):
+      pt.add ln
+      yield state
+      pt.setLen 0
       state = pkDiffHunk
-    elif state!=pkDiffHd and(line.startsWith("diff") or line.startsWith("---")):
-      yield (state, res)                # yield whatever we have & switch
-      res = @[ line ]
+    elif state != pkDiffHd and (ln.startsWith("diff") or ln.startsWith("---")):
+      yield state                       # yield whatever we have & switch
+      pt = @[ ln ]
       state = pkDiffHd                  #..to accumulating diff header
-    elif res.len > 0 and line.startsWith("@@"):
-      yield (state, res)                # New hunk; yield & reset
-      res = @[ line ]
-    elif line.len == 0:                 # one+ pure blanks re-enters commit hdr
-      yield (state, res)
-      res = @[ line ]
+    elif pt.len > 0 and ln.startsWith("@@"):
+      yield state                       # New hunk; yield & reset
+      pt = @[ ln ]
+    elif ln.len == 0:                   # one+ pure blanks re-enters commit hdr
+      yield state
+      pt = @[ ln ]
       state = pkCommitHd
     else:                               # non-blank; accumulate
-      res.add line
-  yield (state, res)
+      pt.add ln
+  yield state
 
 const sb = { ' ', '\\' }  # Mercurial emits "^\ No newline at end of file"
-proc rendDiffHunk(lines: seq[string]) =
+proc rendDiffHunk() =
   ## Fancy intra-line diff highlighting of edit hunks.
-  emit hlHunkHdr, lines[0], hlReg, '\n' # render "@@" hunk header line.
+  emit hlHunkHdr, pt[0], hlReg, '\n' # render "@@" hunk header line.
   var state = ekEql
   var group: seq[string]
   var nDel = 0
-  for i in 1 ..< lines.len:
-    if lines[i].len < 1:
+  for i in 1 ..< pt.len:
+    if pt[i].len < 1:
       raise newException(ValueError, "malformatted diff")
-    let c = lines[i][0]
+    let c = pt[i][0]
     if (state == ekEql and c in sb) or (state == ekDel and c == '-') or
        (c == '+' and state in {ekIns, ekSub}):  # any->self: accumulate
-      group.add lines[i]
+      group.add pt[i]
     elif c in sb:                               # any->eql
       group.render state, nDel; nDel = 0
-      group = @[ lines[i] ]
+      group = @[ pt[i] ]
       state = ekEql
     elif state == ekEql and (c=='-' or c=='+'): # eql->(del|ins)
       group.render state, nDel; nDel = 0
-      group = @[ lines[i] ]
+      group = @[ pt[i] ]
       state = if c == '-': ekDel else: ekIns
     elif state == ekDel and c == '+':           # del->sub
       nDel = group.len
-      group.add lines[i]
+      group.add pt[i]
       state = ekSub
   group.render state, nDel
 
 when isMainModule:
-  import cligen, cligen/osUt; include cligen/mergeCfgEnv
+  import cligen; include cligen/mergeCfgEnv
 
   proc hldiff(color: seq[string] = @[], colors: seq[string] = @[], plain=false,
               simThresh=30, dHdLikeEdit=true, junk=false, blockSkip=20) =
@@ -208,11 +209,11 @@ when isMainModule:
     bskip  = blockSkip
     colors.textAttrRegisterAliases              # colors => registered aliases
     color.parseColor
-    for (pk, lns) in parts(fileStrings("/dev/stdin", '\n')):
-      case pk # if lns.len > 0: echo $pk, ":\n\t", join(lns, "\n\t")
-      of pkCommitHd: (if lns.len > 0: lns.rendCommitHd)
-      of pkDiffHd:   lns.rendDiffHd
-      of pkDiffHunk: lns.rendDiffHunk
+    for pk in stdinParts():
+      case pk # if pt.len > 0: echo $pk, ":\n\t", join(pt, "\n\t")
+      of pkCommitHd: (if pt.len > 0: rendCommitHd())
+      of pkDiffHd:   rendDiffHd()
+      of pkDiffHunk: rendDiffHunk()
 
   dispatch(hldiff, cmdName="hldiff", help = { # cmdName needed for right cf file
              "colors"      : "color aliases; Syntax: name = ATTR1 ATTR2..",
