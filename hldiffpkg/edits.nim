@@ -19,8 +19,8 @@ proc `<`(x, y: Same): bool {.inline.} = x.st.a < y.st.a or x.st.b < y.st.b
 
 proc init*[T](c: var Cmper[T]; s, t: openArray[T];
               junk: HashSet[T] = initHashSet[T]()) =
-  ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is not used, but present
-  ## for consistency with other calls.
+  ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is unused, but present for
+  ## consistency with other calls.
   const empty: seq[int] = @[]
   c.junk = junk
   c.b2js = initTable[T, seq[int]](tables.rightSize(t.len))
@@ -30,7 +30,7 @@ proc init*[T](c: var Cmper[T]; s, t: openArray[T];
 proc initCmper*[T](s, t: openArray[T];
                    junk: HashSet[T] = initHashSet[T]()): Cmper[T] =
   ## Make a new `Cmper` & compute some metadata.  `junk` cannot start a `Same`.
-  ## `s` is not used, but present for consistency with other calls.
+  ## `s` is unused, but present for consistency with other calls.
   result.init(s, t, junk)
 
 proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int]): Same =
