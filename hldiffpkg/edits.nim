@@ -14,7 +14,7 @@ type
     j2len0, j2len1: Table[int, int]
 
 proc eoa(x: Same): int {.inline.} = x.st.a + x.n # A few Same utility procs
-proc eob(x: Same): int {.inline.} = x.st.b + x.n
+proc eob(x: Same): int {.inline.} = x.st.b + x.n # End Of A|B & comparison.
 proc `<`(x, y: Same): bool {.inline.} = x.st.a < y.st.a or x.st.b < y.st.b
 
 proc initCmper*[T](s, t: openArray[T];
