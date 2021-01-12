@@ -133,9 +133,9 @@ proc render(group: seq[string], ek: EdKind, nDel: int) {.inline.} =
   of ekIns: (for ln in group: emit hlIns, ln, hlReg, '\n')
   of ekSub: group.rendSub(nDel)
 
-type PartKind* = enum pkCommitHd, pkDiffHd, pkDiffHunk
+type PartKind = enum pkCommitHd, pkDiffHd, pkDiffHunk
 
-iterator parts*(lines: iterator():string): tuple[pk:PartKind, lns:seq[string]] =
+iterator parts(lines: iterator():string): tuple[pk:PartKind, lns:seq[string]] =
   ## A fast, one-pass iterator to classify input lines into blocks.  Note that
   ## an empty ``pkCommitHd`` occurs @start|end of ``diff -ru``|mercurial inputs.
   var res: seq[string]
