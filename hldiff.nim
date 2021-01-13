@@ -18,7 +18,7 @@ var
     hlEql, hlDel, hlDelEmph, hlIns, hlInsEmph: string #No-lookup access to above
   dhl    = false                # Highlight diff header ---/+++ lines like edits
   thresh = 30                   # Similarity threshold to do char-by-char diff
-  junkDf = false                # Use Python difflib-like junk heuristic
+  junks: HashSet[char]          # Use Python difflib-like junk heuristic
   bskip  = 20                   # Do not char-by-char block pairs > bskip*bskip
 
 var pt: seq[string]             # Current (p)ar(t)/section being highlighted
@@ -73,8 +73,6 @@ proc rendDiffHd() =
     elif dhl and ln.len > 0 and ln[0] == '+': emit hlIns, ln, hlReg, '\n'
     else: emit hlDiffHdr, ln, hlReg, '\n'
 
-const charJunk  = @[ ' ', '\t' ].toHashSet
-const junkEmpty = initHashSet[char]()
 proc rendSub(a, b: int; nDel: int, th=thresh) =
   let n = b + 1 - a
   var mx = 0
@@ -89,7 +87,7 @@ proc rendSub(a, b: int; nDel: int, th=thresh) =
   var pair0: Pair
   for j in nDel ..< n:                            # FIRST PAIR "CLOSE" LINES
     let gJ = pt[a+j][1..^1]
-    var c = initCmper("", gJ, if junkDf: charJunk else: junkEmpty)
+    var c = initCmper("", gJ, junks) # if flg: set1 else: set2 => arc/orc leak
     var pairJ: Pair
     for i in 0 ..< nDel:                          # pairJ -> most similar i
       let gI  = pt[a+i][1..^1]
@@ -208,7 +206,7 @@ when isMainModule:
     ## Use in ``--color`` is case/style/kebab-insensitive.
     thresh = simThresh
     dhl    = dHdLikeEdit
-    junkDf = junk
+    junks  = if junk: @[ ' ', '\t' ].toHashSet else: initHashSet[char]()
     bskip  = blockSkip
     colors.textAttrRegisterAliases              # colors => registered aliases
     color.parseColor
