@@ -31,7 +31,7 @@ take several seconds to minutes on large, old repositories).
 
 I found no other package with a similar "no extra time" trait.  Assuming 2 free
 CPU cores, such a program would need to be no more than 2x slower than `hldiff`.
-E.g., Perl `diff-so-fancy` is 8..11x slower.  Meanwhile `hldiff` is 15-30x
+E.g., Perl `diff-so-fancy` is 9..12x slower.  Meanwhile `hldiff` is 15-30x
 faster than Rust https://github.com/da-x/delta program which crashes immediately
 for me on a Linux kernel `git log -p`. { `delta` does (or tries to do) more work
 to syntax highlight the text on a per prog.lang basis. } I've not timed various
@@ -48,15 +48,15 @@ gcc-10.2 compiled perl-5.32.0.  Times are in seconds. `log -p` times are hot
 cache or also off of a tmpfs.
 | Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
 | :------- | :-----------: | ---------: | ----------: | -----: | -----------:  |
-| Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   5.11 |       45.82   |
-| CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  37.03 |      289.10   |
-| Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 122.45 |     1325.12   |
+| Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   4.63 |       45.82   |
+| CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  33.15 |      289.10   |
+| Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 110.17 |     1325.12   |
 
-`git log -p` varies from 7..20 MB/s, `hldiff` hits 28..42 MB/s while
-`diff-so-fancy` goes at 3.57..3.87 MB/s.  If default `hldiff` is too slow, you
-can use `hldiff -b10` to lower the too big abort threshold for char-by-char
-highlights of substitution hunks.  For the above three e.g.s this lowers times
-to 4.15, 25.59, 100.94 seconds.  Chances are good that it's fast enough, though.
+`git log -p` varies from 7..20 MB/s, `hldiff` hits 31..47 MB/s, `diff-so-fancy`
+does 3.57..3.87 MB/s.  Chances are default `hldiff` is fast enough, but you can
+speed it up with, e.g., `hldiff -b10` to lower abort thresholds for char-by-char
+highlights of substitution hunks.  For the above 3 e.g.s this lowers times to
+3.76, 23.66, 93.63 seconds.
 
 Installation
 ============
