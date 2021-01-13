@@ -86,5 +86,5 @@ black, red, green, yellow, blue, purple, cyan, white;
 UPPERCASE =>HIGH intensity; "on_" prefix => BACKGROUND color
 256-color attrs are [fb][0..23] for FORE/BACK grey scl & [fb]RGB
 a 6x6x6 color cube; each [RGB] is on [0,5].
-xterm/st/kitty/alacrity true color: [fb]HHHHHH (usual RGB mapping).
+xterm/st/kitty/alacrity true color: [fb]HHHHHH (usual RGB order).
 ```
