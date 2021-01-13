@@ -83,9 +83,10 @@ proc rendSub(a, b: int; nDel: int, th=thresh) =
     for i in 0 ..< nDel: emit hlDel, pt[a+i], hlReg, '\n' #..useless for giants
     for j in nDel ..< n: emit hlIns, pt[a+j], hlReg, '\n'
     return
-  type Pair = tuple[i, sim: int; ss: seq[Same]]
-  var pairs = initTable[int, Pair](tables.rightSize(nDel))
-  var sims  = initTable[int, tuple[sim, j: int]](tables.rightSize(nDel))
+  type Pair = tuple[i, sim: uint16; ss: seq[Same]]
+  var pairs = newSeq[Pair](b + 1)
+  var sims  = newSeq[tuple[sim, j: uint16]](b + 1)
+  var pair0: Pair
   for j in nDel ..< n:                            # FIRST PAIR "CLOSE" LINES
     let gJ = pt[a+j][1..^1]
     var c = initCmper("", gJ, if junkDf: charJunk else: junkEmpty)
@@ -95,17 +96,18 @@ proc rendSub(a, b: int; nDel: int, th=thresh) =
       let sMx = gI.len + gJ.len                   # check upper bounds first
       if min(gI.len, gJ.len)*100 > th * sMx and similUB1(gI, gJ)*100 > th * sMx:
         let ss  = c.sames(gI, gJ)                 # ss = CHAR-BY-CHAR DIFF
-        let sim = ss.similarity * 10_000 div sMx
-        if sim > 100 * th and sim > pairJ.sim:
-          pairJ.i   = i
+        let sim = uint16(ss.similarity * 10_000 div sMx)
+        if sim > uint16(100 * th) and sim > pairJ.sim:
+          pairJ.i   = i.uint16
           pairJ.sim = sim
           pairJ.ss  = ss
-    if pairJ.sim > sims.getOrDefault(pairJ.i, (0, 0)).sim:
-      sims[pairJ.i] = (pairJ.sim, j)              # Retain only max sim @given i
+    if pairJ.sim > sims[pairJ.i].sim:
+      sims[pairJ.i] = (pairJ.sim, j.uint16)       # Retain only max sim @given i
       pairs[j] = move(pairJ)
   for i in 0 ..< nDel:
-    if i in sims and sims[i].j in pairs:          # CHAR-BY-CHAR DIFF => HILITE
-      let j = sims[i].j; let gI = pt[a+i][1..^1]  # let gJ = pt[a+j][1..^1]
+    let j = sims[i].j
+    if j > 0 and pairs[sims[i].j] != pair0:       # CHAR-BY-CHAR DIFF => HILITE
+      let gI = pt[a+i][1..^1]                     # let gJ = pt[a+j][1..^1]
       emit hlDel, '-', hlReg
       for ed in edits(pairs[j].ss):
         case ed.ek
@@ -116,7 +118,7 @@ proc rendSub(a, b: int; nDel: int, th=thresh) =
     else:
       emit hlDel, pt[a+i], hlReg, '\n'
   for j in nDel ..< n:
-    if j in pairs:                                # CHAR-BY-CHAR DIFF => HILITE
+    if pairs[j] != pair0:                         # CHAR-BY-CHAR DIFF => HILITE
       let p = pairs[j]; let gJ = pt[a+j][1..^1]
       emit hlIns, '+', hlReg
       for ed in edits(p.ss):
