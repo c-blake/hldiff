@@ -10,8 +10,7 @@ type
   Edit*   = tuple[ek: EdKind; s, t: Slice[int]] ## 2-seq edit op & args
   Cmper*[T] = object                            ## state used to compute edits
     junk: HashSet[T]
-    b2js: Table[T, seq[int]]
-    j2len0, j2len1: Table[int, int]
+    t2js: Table[T, int]
 
 proc eoa(x: Same): int {.inline.} = x.st.a + x.n # A few Same utility procs
 proc eob(x: Same): int {.inline.} = x.st.b + x.n # End Of A|B & comparison.
@@ -21,11 +20,10 @@ proc init*[T](c: var Cmper[T]; s, t: openArray[T];
               junk: HashSet[T] = initHashSet[T]()) =
   ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is unused, but present for
   ## consistency with other calls.
-  const empty: seq[int] = @[]
   c.junk = junk
-  c.b2js = initTable[T, seq[int]](tables.rightSize(t.len))
+  c.t2js = initTable[T, int](tables.rightSize(t.len))
   for j, key in t:                              # chain `t`
-    if key notin junk: c.b2js.mgetOrPut(key, empty).add j
+    if key notin junk: c.t2js.add(key, j)
 
 proc initCmper*[T](s, t: openArray[T];
                    junk: HashSet[T] = initHashSet[T]()): Cmper[T] =
@@ -33,21 +31,22 @@ proc initCmper*[T](s, t: openArray[T];
   ## `s` is unused, but present for consistency with other calls.
   result.init(s, t, junk)
 
-proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int]): Same =
+proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int];
+            j2len0, j2len1: var seq[int]): Same =
   # Return longest common subseq between the two seqs, within given s/t slices.
   result = (x.a..y.a, 0)                        # init result
   var r = result                                # `template r=result` fails
-  c.j2len0.clear
+  j2len0[0].addr.zeroMem j2len0[0].sizeof * j2len0.len
   for i in x.a ..< x.b:                         # Look at all s[i] in t
-    c.j2len1.clear                  #Q: Size-test to not propagate giant Tables?
-    for j in c.b2js.getOrDefault(s[i], @[]):
+    j2len1[0].addr.zeroMem j2len1[0].sizeof * j2len1.len
+    for j in c.t2js.allValues(s[i]):
       if j <  y.a: continue
       if j >= y.b: break
-      let k = c.j2len0.getOrDefault(j-1, 0) + 1
-      c.j2len1[j] = k
+      let k = j2len0[j] + 1
+      j2len1[j+1] = k
       if k > r.n:
         r = (i-k+1 .. j-k+1, k)
-    c.j2len0 = c.j2len1
+    j2len0 = j2len1
   while r.st.a > x.a and r.st.b > y.a and
         t[r.st.b-1] notin c.junk and s[r.st.a-1] == t[r.st.b-1]:
     dec r.st.a; dec r.st.b; inc r.n             # Extend non-junk @front
@@ -65,10 +64,12 @@ proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int]): Same =
 proc sames*[T](c: var Cmper[T]; s, t: openArray[T]): seq[Same] =
   ## Return every `Same` across the two seqs.  Access via `iterator edits`.
   var blocks: seq[Same]                         # Preliminary sames
+  var j2len0 = newSeq[int](max(s.len, t.len) + 1)
+  var j2len1 = j2len0
   var q = @[ (0..s.len, 0..t.len) ]
   while q.len > 0:
     let (x, y) = q.pop
-    let m = c.lcs(s, t, x, y)                   # s[m.a..<m.eoa]==t[m.b..<m.eob]
+    let m = c.lcs(s, t, x, y, j2len0, j2len1)   # s[m.a..<m.eoa]==t[m.b..<m.eob]
     if m.n > 0:
       blocks.add m
       if x.a < m.st.a and y.a < m.st.b: q.add (x.a..m.st.a, y.a..m.st.b)
