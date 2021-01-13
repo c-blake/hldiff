@@ -40,6 +40,15 @@ not go multi-threaded for highlighting purposes.  So, `hldiff` may be the only
 way (at present) to highlight diff output that does not make users wait longer
 on already slow jobs.
 
+Here is a table of several reproducible timing experiments with logs saved to
+a RAM filesystem (Linux tmpfs) on an Intel i6700k.  hldiff is PGO-gcc compiled
+highlighting its own history as a test program.  diff-so-fancy is vsn 1.3.0.
+| Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
+| :------- | :-----------: | :--------: | :---------: | :----: | -----------:  |
+| Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 122.45 |     1325.12   |
+| CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  37.03 |      289.10   |
+| Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   5.11 |       45.82   |
+
 Installation
 ============
 What you need is to first compile it (`git clone cligen`, `git clone this`, then
