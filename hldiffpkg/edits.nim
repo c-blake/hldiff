@@ -32,21 +32,23 @@ proc initCmper*[T](s, t: openArray[T];
   result.init(s, t, junk)
 
 proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int];
-            j2len0, j2len1: var seq[int]): Same =
+            n0, n1: var seq[int]): Same =
   # Return longest common subseq between the two seqs, within given s/t slices.
   result = (x.a..y.a, 0)                        # init result
   var r = result                                # `template r=result` fails
-  j2len0[0].addr.zeroMem j2len0[0].sizeof * j2len0.len
+  var n0p = n0.addr
+  var n1p = n1.addr
+  n0[0].addr.zeroMem n0[0].sizeof * n0.len
   for i in x.a ..< x.b:                         # Look at all s[i] in t
-    j2len1[0].addr.zeroMem j2len1[0].sizeof * j2len1.len
+    n1p[][0].addr.zeroMem n1[0].sizeof * n1.len
     for j in c.t2js.allValues(s[i]):
       if j <  y.a: continue
       if j >= y.b: break
-      let k = j2len0[j] + 1
-      j2len1[j+1] = k
+      let k = n0p[][j] + 1
+      n1p[][j+1] = k
       if k > r.n:
         r = (i-k+1 .. j-k+1, k)
-    j2len0 = j2len1
+    swap n0p, n1p
   while r.st.a > x.a and r.st.b > y.a and
         t[r.st.b-1] notin c.junk and s[r.st.a-1] == t[r.st.b-1]:
     dec r.st.a; dec r.st.b; inc r.n             # Extend non-junk @front
@@ -64,12 +66,12 @@ proc lcs[T](c: var Cmper[T]; s, t: openArray[T]; x, y: Slice[int];
 proc sames*[T](c: var Cmper[T]; s, t: openArray[T]): seq[Same] =
   ## Return every `Same` across the two seqs.  Access via `iterator edits`.
   var blocks: seq[Same]                         # Preliminary sames
-  var j2len0 = newSeq[int](max(s.len, t.len) + 1)
-  var j2len1 = j2len0
+  var n0 = newSeq[int](max(s.len, t.len) + 1)
+  var n1 = n0
   var q = @[ (0..s.len, 0..t.len) ]
   while q.len > 0:
     let (x, y) = q.pop
-    let m = c.lcs(s, t, x, y, j2len0, j2len1)   # s[m.a..<m.eoa]==t[m.b..<m.eob]
+    let m = c.lcs(s, t, x, y, n0, n1)   # s[m.a..<m.eoa]==t[m.b..<m.eob]
     if m.n > 0:
       blocks.add m
       if x.a < m.st.a and y.a < m.st.b: q.add (x.a..m.st.a, y.a..m.st.b)
