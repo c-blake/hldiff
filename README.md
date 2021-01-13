@@ -49,6 +49,7 @@ running under gcc-10.2 compiled perl-5.32.0.  Times are in seconds.
 | Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 122.45 |     1325.12   |
 | CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  37.03 |      289.10   |
 | Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   5.11 |       45.82   |
+
 `git log -p` varies from 7..20 MB/s, `hldiff` hits 28..42 MB/s while
 `diff-so-fancy` goes at 3.57..3.87 MB/s.
 
