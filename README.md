@@ -60,9 +60,9 @@ to 4.15, 25.59, 100.94 seconds.  Chances are good that it's fast enough, though.
 
 Installation
 ============
-What you need is to first compile it (`git clone cligen`, `git clone this`, then
-`nim c --path:to/cligen -d:danger hldiff` or `nimble install --passNim:-d:danger
-hldiff`).
+What you need is to first compile it (`git clone cligen`, `git clone this`,
+then `nim c --path:to/cligen --gc:arc -d:useMalloc -d:danger hldiff` or
+`nimble install --passNim:-d:danger --gc:arc -d:useMalloc hldiff`).
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
