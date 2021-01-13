@@ -27,17 +27,18 @@ package is over 90x faster than the Python impl.  Applied to highlighting, this
 achieves an interesting property.  Since `hldiff` is typically 2..6x faster
 than `git log -p`, if you have >=1.5 free CPU cores (a common case for me) then
 `git log -p|hldiff` should take *no more real time* than `git log -p` (which can
-take quite a while in human terms on a large, old repository).  I found no other
-package with a similar "no extra time" trait.  Assuming 2 free CPU cores, such a
-program would need to be no more than 2x slower than `hldiff`.  E.g., `hldiff`
-is about 12x faster than a Perl `diff-so-fancy` & 15-30x faster than a Rust
-https://github.com/da-x/delta program which crashes immediately for me on a
-Linux kernel `git log -p`. { `delta` does (or tries to do) more work to syntax
-highlight the text on a per prog.lang basis. } I've not timed various `git diff
---word-diff-regex` configs, but regexes get awfully slow and git does not go
-multi-threaded for highlighting purposes.  So, `hldiff` may be the only way (at
-present) to highlight diff output that does not make users wait longer on
-already slow jobs.
+take several seconds to minutes on large, old repositories).
+
+I found no other package with a similar "no extra time" trait.  Assuming 2 free
+CPU cores, such a program would need to be no more than 2x slower than `hldiff`.
+E.g., `hldiff` is about 12x faster than a Perl `diff-so-fancy` & 15-30x faster
+than a Rust https://github.com/da-x/delta program which crashes immediately for
+me on a Linux kernel `git log -p`. { `delta` does (or tries to do) more work to
+syntax highlight the text on a per prog.lang basis. } I've not timed various
+`git diff --word-diff-regex` configs, but regexes get awfully slow and git does
+not go multi-threaded for highlighting purposes.  So, `hldiff` may be the only
+way (at present) to highlight diff output that does not make users wait longer
+on already slow jobs.
 
 Installation
 ============
