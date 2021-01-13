@@ -43,8 +43,10 @@ on already slow jobs.
 Installation
 ============
 If you want to use it, what you need is to first compile it (`git clone cligen`
-+ `git clone this`, then `nim c --path:to/cligen -d:danger hldiff` or `nimble
-install --passNim:-d:danger hldiff`).  Then to `$HOME/.config/hg/hgrc` add
+, `git clone this`, then `nim c --path:to/cligen -d:danger hldiff` or `nimble
+install --passNim:-d:danger hldiff`).
+
+Then to `$HOME/.config/hg/hgrc` add
 ```
 [pager]
 pager = hldiff|less -R
