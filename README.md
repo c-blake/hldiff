@@ -31,23 +31,26 @@ take several seconds to minutes on large, old repositories).
 
 I found no other package with a similar "no extra time" trait.  Assuming 2 free
 CPU cores, such a program would need to be no more than 2x slower than `hldiff`.
-E.g., `hldiff` is about 12x faster than a Perl `diff-so-fancy` & 15-30x faster
-than a Rust https://github.com/da-x/delta program which crashes immediately for
-me on a Linux kernel `git log -p`. { `delta` does (or tries to do) more work to
-syntax highlight the text on a per prog.lang basis. } I've not timed various
+E.g., Perl `diff-so-fancy` is 8..11x slower.  Meanwhile `hldiff` is 15-30x
+faster than Rust https://github.com/da-x/delta program which crashes immediately
+for me on a Linux kernel `git log -p`. { `delta` does (or tries to do) more work
+to syntax highlight the text on a per prog.lang basis. } I've not timed various
 `git diff --word-diff-regex` configs, but regexes get awfully slow and git does
-not go multi-threaded for highlighting purposes.  So, `hldiff` may be the only
-way (at present) to highlight diff output that does not make users wait longer
-on already slow jobs.
+not go multi-threaded for highlighting purposes.  So, as far as I can tell,
+`hldiff` may be the only way (at present) to highlight diff output that does not
+make users wait longer on already slow jobs.
 
 Here is a table of several reproducible timing experiments with logs saved to
 a RAM filesystem (Linux tmpfs) on an Intel i6700k.  hldiff is PGO-gcc compiled
-highlighting its own history as a test program.  diff-so-fancy is vsn 1.3.0.
+highlighting its own history as a test program.  `diff-so-fancy` is vsn 1.3.0
+running under gcc-10.2 compiled perl-5.32.0.  Times are in seconds.
 | Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
 | :------- | :-----------: | :--------: | :---------: | :----: | -----------:  |
 | Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 122.45 |     1325.12   |
 | CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  37.03 |      289.10   |
 | Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   5.11 |       45.82   |
+`git log -p` varies from 7..20 MB/s, `hldiff` hits 28..42 MB/s while
+`diff-so-fancy` goes at 3.57..3.87 MB/s.
 
 Installation
 ============
