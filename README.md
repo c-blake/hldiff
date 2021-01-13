@@ -67,7 +67,3 @@ UPPERCASE =>HIGH intensity; "on_" prefix => BACKGROUND color
 a 6x6x6 color cube; each [RGB] is on [0,5].
 xterm/st true colors are [fb]HHHHHH (usual R,G,B mapping).
 ```
-
-***NOTE*** Nim-devel versions from Summer 2020 until the present leak memory
-in `--gc:arc` or `--gc:orc` mode.  So, don't compile with that and use the
-resulting program on large diff histories.
