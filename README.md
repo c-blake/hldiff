@@ -42,9 +42,9 @@ on already slow jobs.
 
 Installation
 ============
-If you want to use it, what you need is to first compile it (`git clone cligen`
-, `git clone this`, then `nim c --path:to/cligen -d:danger hldiff` or `nimble
-install --passNim:-d:danger hldiff`).
+What you need is to first compile it (`git clone cligen`, `git clone this`, then
+`nim c --path:to/cligen -d:danger hldiff` or `nimble install --passNim:-d:danger
+hldiff`).
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
