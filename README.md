@@ -40,10 +40,11 @@ not go multi-threaded for highlighting purposes.  So, as far as I can tell,
 `hldiff` may be the only way (at present) to highlight diff output that does not
 make users wait longer on already slow jobs.
 
-Here is a table of several reproducible timing experiments with logs saved to
-a RAM filesystem (Linux tmpfs) on an Intel i6700k.  hldiff is PGO-gcc compiled
-highlighting its own history as a test program.  `diff-so-fancy` is vsn 1.3.0
-running under gcc-10.2 compiled perl-5.32.0.  Times are in seconds.
+Here is a table of several reproducible timing experiments with logs from the
+mentioned newest commit to the beginning of time saved to a RAM filesystem
+(Linux tmpfs) on an Intel i6700k.  hldiff is PGO-gcc compiled highlighting its
+own history as a test program.  `diff-so-fancy` is vsn 1.3.0 running under
+gcc-10.2 compiled perl-5.32.0.  Times are in seconds.
 | Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
 | :------- | :-----------: | :--------: | :---------: | :----: | -----------:  |
 | Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 122.45 |     1325.12   |
