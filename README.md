@@ -44,7 +44,8 @@ Here is a table of several reproducible timing experiments with logs from the
 mentioned newest commit to the beginning of time saved to a RAM filesystem
 (Linux tmpfs) on an Intel i6700k.  hldiff is PGO-gcc compiled highlighting its
 own history as a test program.  `diff-so-fancy` is vsn 1.3.0 running under
-gcc-10.2 compiled perl-5.32.0.  Times are in seconds.
+gcc-10.2 compiled perl-5.32.0.  Times are in seconds. `log -p` times are hot
+cache or also off of a tmpfs.
 | Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
 | :------- | :-----------: | ---------: | ----------: | -----: | -----------:  |
 | Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   5.11 |       45.82   |
