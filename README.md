@@ -56,14 +56,15 @@ program.  `diff-so-fancy-1.3.0` runs under gcc-10.2-compiled perl-5.32.
 `git log -p` varies from 7..20 MB/s, `hldiff` hits 31..47 MB/s, `diff-so-fancy`
 does 3.57..3.87 MB/s.  Chances are default `hldiff` is fast enough, but you can
 speed it up with, e.g., `hldiff -b10` to lower abort thresholds for char-by-char
-highlights of substitution hunks.  For the above 3 e.g.s this lowers times to
-3.76, 23.66, 93.63 seconds.
+highlights of substitution hunks.  For the above 3 e.g.s tims become 3.76,
+23.66, 93.63 seconds.
 
 Installation
 ============
 What you need is to first compile it (`git clone cligen`, `git clone this`,
 then `nim c --path:to/cligen --gc:arc -d:useMalloc -d:danger hldiff` or
-`nimble install --passNim:-d:danger --gc:arc -d:useMalloc hldiff`).
+`nimble install --passNim:-d:danger --gc:arc -d:useMalloc hldiff`).  (A PGO
+build is a user-excercise but only about 10% faster in this case.)
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
