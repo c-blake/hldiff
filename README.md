@@ -44,14 +44,14 @@ Performance Evaluation
 ======================
 Here is a table of timing results from reproducible logs.  Times are in seconds.
 Input is from the mentioned newest commit to the beginning of time saved to a
-RAM FS (Linux tmpfs) on an Intel i6700k.  `log -p` is also off of a tmpfs
+RAM FS (Linux tmpfs) on an Intel i6700k.  `git log -p` is also off of a tmpfs
 `.git`.  `hldiff` is PGO-gcc compiled highlighting its own history as a test
 program.  `diff-so-fancy-1.3.0` runs under gcc-10.2-compiled perl-5.32.
-| Source   | Newest Commit |  Bytes     | git log -p  | hldiff | diff-so-fancy |
-| :------- | :-----------: | ---------: | ----------: | -----: | -----------:  |
-| Nim-dev  | ..db6b1e5769b |  176119650 |     8.73    |   4.63 |       45.82   |
-| CPython  | ..d3277048ac6 | 1032265657 |    69.58    |  33.15 |      289.10   |
-| Linux    | ..71d8e5ff763 | 5124372488 |   731.48    | 110.17 |     1325.12   |
+| Source  | Newest Commit |      Bytes | log -p | hldiff | diff-so-fancy |
+| :------ | :-----------: | ---------: | -----: | -----: | ------------: |
+| Nim-dev | ..db6b1e5769b |  176119650 |   8.73 |   4.63 |         45.82 |
+| CPython | ..d3277048ac6 | 1032265657 |  69.58 |  33.15 |        289.10 |
+| Linux   | ..71d8e5ff763 | 5124372488 | 731.48 | 110.17 |       1325.12 |
 
 `git log -p` varies from 7..20 MB/s, `hldiff` hits 31..47 MB/s, `diff-so-fancy`
 does 3.57..3.87 MB/s.  Chances are default `hldiff` is fast enough, but you can
