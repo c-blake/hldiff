@@ -8,7 +8,7 @@ diff`, or `hg diff` with user-customizable ANSI/SGR escapes. Color configuration
 is similar to
 [cligen](https://github.com/c-blake/cligen)/[lc](https://github.com/c-blake/lc)/[procs](https://github.com/c-blake/procs)
 using the same internal engine.  `edits` also provides/exports an edit distance
-based on the edit algorithm (from Ratcliff1988), here called `similarity` and a
+based on the algorithm (from Ratcliff1988), here called `similarity` and a
 common-needs API `closeTo` that gives "nearby suggestions" for Nim `string`s.
 
 Motivation
