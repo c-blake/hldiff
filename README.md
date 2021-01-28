@@ -49,15 +49,15 @@ RAM FS (Linux tmpfs) on an Intel i6700k.  `git log -p` is also off of a tmpfs
 program.  `diff-so-fancy-1.3.0` runs under gcc-10.2-compiled perl-5.32.
 | Source  | Newest Commit |      Bytes | log -p | hldiff | diff-so-fancy |
 | :------ | :-----------: | ---------: | -----: | -----: | ------------: |
-| Nim-dev | ..db6b1e5769b |  176119650 |   8.73 |   4.63 |         45.82 |
-| CPython | ..d3277048ac6 | 1032265657 |  69.58 |  33.15 |        289.10 |
-| Linux   | ..71d8e5ff763 | 5124372488 | 731.48 | 110.17 |       1325.12 |
+| Nim-dev | ..db6b1e5769b |  176119650 |   8.73 |   4.36 |         45.82 |
+| CPython | ..d3277048ac6 | 1032265657 |  69.58 |  31.33 |        289.10 |
+| Linux   | ..71d8e5ff763 | 5124372488 | 731.48 | 100.58 |       1325.12 |
 
-`git log -p` varies from 7..20 MB/s, `hldiff` hits 31..47 MB/s, `diff-so-fancy`
+`git log -p` varies from 7..20 MB/s, `hldiff` hits 33..51 MB/s, `diff-so-fancy`
 does 3.57..3.87 MB/s.  Chances are default `hldiff` is fast enough, but you can
 speed it up with, e.g., `hldiff -b10` to lower abort thresholds for char-by-char
-highlights of substitution hunks.  For the above 3 e.g.s times become 3.76,
-23.66, 93.63 seconds.
+highlights of substitution hunks.  For the above 3 e.g.s times become 3.5,
+22.0, 85.5 seconds.
 
 Installation
 ============
