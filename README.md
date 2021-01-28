@@ -61,10 +61,10 @@ highlights of substitution hunks.  For the above 3 e.g.s times become 3.76,
 
 Installation
 ============
-What you need is to first compile it (`git clone cligen`, `git clone this`,
-then `nim c --path:to/cligen --gc:arc -d:useMalloc -d:danger hldiff` or
-`nimble install --passNim:-d:danger --gc:arc -d:useMalloc hldiff`).  (A PGO
-build is a user-excercise but only about 10% faster in this case.)
+First compile it (`git clone <CLIGEN>`, `git clone <THIS>`, and then
+`nim c --path:to/cligen --gc:orc -d:danger hldiff`.  Alternatively, you can
+`nimble install hldiff`).  A profile-guided optimization (PGO) build is a
+user-excercise but only about 10% faster in this case.
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
