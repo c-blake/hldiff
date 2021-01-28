@@ -64,7 +64,7 @@ Installation
 First compile it (`git clone <CLIGEN>`, `git clone <THIS>`, and then
 `nim c --path:to/cligen --gc:orc -d:danger hldiff`.  Alternatively, you can
 `nimble install hldiff`).  A profile-guided optimization (PGO) build is a
-user-excercise but only about 10% faster in this case.
+user-exercise but only about 10% faster in this case.
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
