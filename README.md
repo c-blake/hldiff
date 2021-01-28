@@ -23,8 +23,8 @@ better served by just hacking `LC_THEME` into `git diff`, though that is a less
 fun micro-project. ;-) }
 
 After writing it, a secondary motivation emerged.  The core difflib part of this
-package is ~90x faster than the Python impl.  Applied to highlighting, this
-yields a useful trait.  Since `hldiff` is typically 2-6x faster than `git log
+package is ~100x faster than the Python impl.  Applied to highlighting, this
+yields a useful trait.  Since `hldiff` is typically 2-7x faster than `git log
 -p`, if you have >=1.5 free CPU cores (a common case for me) then `git log -p |
 hldiff` should take *no more real time* than `git log -p` (which can take an
 annoyingly long time itself).  I found no other package with a similar "no extra
@@ -32,7 +32,7 @@ time" trait.
 
 Assuming 2 free CPU cores, such a program would need to be no more than 2x
 slower than `hldiff`.  E.g., Perl `diff-so-fancy` is 9..12x slower.  Meanwhile
-`hldiff` is 15-30x faster than Rust https://github.com/da-x/delta program which
+`hldiff` is 17-33x faster than Rust https://github.com/da-x/delta program which
 crashes immediately for me on a Linux kernel `git log -p`. { `delta` does (or
 tries to do) more work to syntax highlight the text on a per prog.lang basis. }
 I've not timed various `git diff --word-diff-regex` configs, but regexes get
