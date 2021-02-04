@@ -209,7 +209,7 @@ when isMainModule:
     junks  = if junk: @[ ' ', '\t' ].toHashSet else: initHashSet[char]()
     bskip  = blockSkip
     colors.textAttrRegisterAliases              # colors => registered aliases
-    color.parseColor
+    color.parseColor plain
     for pk in stdinParts():
       case pk # if pt.len > 0: echo $pk, ":\n\t", join(pt, "\n\t")
       of pkCommitHd: (if pt.len > 0: rendCommitHd())
