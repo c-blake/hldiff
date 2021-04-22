@@ -1,5 +1,5 @@
 import std/[strutils, os, sets, tables], hldiffpkg/edits,
-       cligen/[parseopt3, osUt, textUt, humanUt]
+       cligen/[parseopt3, sysUt, osUt, textUt, humanUt]
 var
   highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
     "regular"           : "plain"      ,
@@ -23,7 +23,12 @@ var
 
 var pt: seq[string]             # Current (p)ar(t)/section being highlighted
 
-proc emit(a: varargs[string, `$`]) {.inline.} = stdout.urite(a)
+let outSeekable = stdout.seekable # never changes after start-up
+proc emit(a: varargs[string, `$`]) {.inline.} =
+  try: stdout.urite(a)
+  except:                 # Block/silence exception if out unseekable pipe|tty
+    if outSeekable: raise # Could check errno==EPIPE but hard to port to MSWin
+    else: quit(0)         # No raise for consumer (more, less, etc.) shutdown.
 
 proc parseColor(color: seq[string], plain=false) =
   let plain = plain or existsEnv("NO_COLOR")
