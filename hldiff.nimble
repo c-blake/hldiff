@@ -1,5 +1,5 @@
 # Package
-version     = "0.5"
+version     = "0.6"
 author      = "Charles Blake"
 description = "A port of Python difflib to compute & (re)highlight diff output intraline"
 license     = "MIT/ISC"
