@@ -7,4 +7,4 @@ installExt  = @[ "nim" ]
 bin         = @[ "hldiff", "hldiffpkg/edits" ]
 
 # Dependencies
-requires "nim >= 0.20.2", "cligen >= 1.5.2"
+requires "nim >= 0.20.2", "cligen >= 1.5.3"
