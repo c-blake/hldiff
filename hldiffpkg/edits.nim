@@ -21,7 +21,7 @@ proc init*[T](c: var Cmper[T]; s, t: openArray[T];
   ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is unused, but present for
   ## consistency with other calls.
   c.junk = junk
-  c.t2js = initTable[T, int](tables.rightSize(t.len))
+  c.t2js = initTable[T, int](t.len)
   for j, key in t:                              # chain `t`
     if key notin junk: c.t2js.add(key, j)
 
@@ -135,7 +135,7 @@ proc grouped*(ss: seq[Same], n=3): seq[seq[Edit]] =
     result.add grp
 
 proc count[T](s: openArray[T]): Table[T, int] =
-  result = initTable[T, int](tables.rightSize(s.len div 2))
+  result = initTable[T, int](s.len div 2)
   for e in s: result.mgetOrPut(e, 0).inc
 
 proc autojunk*[T](s: openArray[T], ajDiv=0): seq[T] =
