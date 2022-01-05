@@ -85,7 +85,12 @@ and in your `$HOME/.config/git/config` add
   diff = "hldiff|less -R"
 ```
 You may also want a wrapper script/shell function `diffu` to do `diff -u
-"$@"|hldiff` or similar.
+"$@"|hldiff` or similar.  With a default build and the files `a` and `b` in this
+repository, I get:
+```sh
+diff -u a b | hldiff
+```
+producing [this output](egOut.png).
 
 You will also want to `cp example.cf $HOME/.config/hldiff` and edit it to your
 liking.  ANSI SGR escape names are the usual suspects from `cligen/humanUt.nim`:
