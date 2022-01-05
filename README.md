@@ -1,5 +1,12 @@
-Overview
-========
+# Index
+
+ *  [Overview](#overview)
+ *  [Motivation](#motivation)
+ *  [Performance Evaluation](#performance-evaluation)
+ *  [Installation](#installation)
+
+### Overview
+
 This package is a port of Python's `difflib` algorithms to compute edits, diffs,
 patches on pairs of `seq[T]` (lines, chars, etc.) in `hldiffpkg/edits.nim`.
 An example re-implementation of `diff -u` ends `hldiffpkg/edits.nim`.  `edits`
@@ -11,8 +18,8 @@ using the same internal engine.  `edits` also provides/exports an edit distance
 based on the algorithm (from Ratcliff1988), here called `similarity` and a
 common-needs API `closeTo` that gives "nearby suggestions" for Nim `string`s.
 
-Motivation
-==========
+### Motivation
+
 While writing it, it became clear that `git diff` as a standalone `diff` program
 (via e.g. `--color-words`, `--word-diff-regex`, etc.) supports the highlighting
 I had wanted.  In spite of this, it wasn't a waste of time for me, personally,
@@ -40,8 +47,8 @@ awfully slow and git does not go multi-threaded for highlighting purposes.  So,
 as far as I can tell, `hldiff` may be the only way (at present) to highlight
 diff output that does not make users wait longer on already slow jobs.
 
-Performance Evaluation
-======================
+### Performance Evaluation
+
 Here is a table of timing results from reproducible logs.  Times are in seconds.
 Input is from the mentioned newest commit to the beginning of time saved to a
 RAM FS (Linux tmpfs) on an Intel i6700k.  `git log -p` is also off of a tmpfs
@@ -59,8 +66,8 @@ speed it up with, e.g., `hldiff -b10` to lower abort thresholds for char-by-char
 highlights of substitution hunks.  For the above 3 e.g.s times become 3.5,
 22.0, 85.5 seconds.
 
-Installation
-============
+### Installation
+
 First compile it (`git clone <CLIGEN>`, `git clone <THIS>`, and then
 `nim c --path:to/cligen --gc:orc -d:danger hldiff`.  Alternatively, you can
 `nimble install hldiff`).  A profile-guided optimization (PGO) build is a
