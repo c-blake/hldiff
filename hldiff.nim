@@ -216,7 +216,7 @@ when isMainModule:
       of pkDiffHd:   rendDiffHd()
       of pkDiffHunk: rendDiffHunk()
 
-  dispatch(hldiff, cmdName="hldiff", help = { # cmdName needed for right cf file
+  dispatch(hldiff, help = {
              "colors"      : "color aliases; Syntax: name = ATTR1 ATTR2..",
              "color"       : "text attrs for syntax elts; Like lc/etc.",
              "plain"       : "turn off ANSI SGR escape colorization",
