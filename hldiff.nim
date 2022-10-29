@@ -1,5 +1,6 @@
 import std/[strutils, os, sets, tables], hldiffpkg/edits,
        cligen/[parseopt3, sysUt, osUt, textUt, humanUt]
+when not declared(stdin): import std/syncio
 var
   highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
     "regular"           : "plain"      ,
