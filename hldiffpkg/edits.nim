@@ -2,7 +2,7 @@
 ## Algorithm is Python's `difflib.SequenceMatcher` follow-on to Ratcliff1988's
 ## edit distance with run time ~ `[o(n), O(n^2)]` where `n = max(s.len, t.len)`.
 
-import std/[tables, algorithm, sets, sequtils, heapqueue]
+import std/[tables, algorithm, sets, sequtils, heapqueue], adix/lptabz
 
 type
   EdKind* = enum ekEql, ekDel, ekIns, ekSub
@@ -10,7 +10,7 @@ type
   Edit*   = tuple[ek: EdKind; s, t: Slice[int]] ## 2-seq edit op & args
   Cmper*[T] = object                            ## state used to compute edits
     junk: HashSet[T]
-    t2js: Table[T, int]
+    t2js: LPTab[T, int]
 
 proc eoa(x: Same): int {.inline.} = x.st.a + x.n # A few Same utility procs
 proc eob(x: Same): int {.inline.} = x.st.b + x.n # End Of A|B & comparison.
@@ -21,7 +21,7 @@ proc init*[T](c: var Cmper[T]; s, t: openArray[T];
   ## Re-init `c`.  `junk` cannot start a `Same`.  `s` is unused, but present for
   ## consistency with other calls.
   c.junk = junk
-  c.t2js = initTable[T, int](t.len)
+  c.t2js = initLPTab[T, int](t.len)
   for j, key in t:                              # chain `t`
     if key notin junk: c.t2js.add(key, j)
 
