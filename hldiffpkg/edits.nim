@@ -126,7 +126,7 @@ proc grouped*(ss: seq[Same], n=3): seq[seq[Edit]] =
     if ed.ek == ekEql and ed.s.b - ed.s.a > 2*n:    # big range w/no diff
       grp.add (ekEql, ed.s.a ..< min(ed.s.b, ed.s.a + n),
                       ed.t.a ..< min(ed.t.b, ed.t.a + n))
-      result.add grp                                # end current & start new
+      result.add grp[0..^1]                         # end current & start new
       grp.setLen 0
       e.s.a = max(ed.s.a, ed.s.b - n)
       e.t.a = max(ed.t.a, ed.t.b - n)
