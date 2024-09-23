@@ -188,7 +188,7 @@ proc rangeUni*(start, stop: int): string {.inline.} =
   return $begin & "," & $size
 
 when isMainModule:
-  import os, times, strutils, cligen
+  import std/[os, times, strutils], cligen
   when not declared(File): import std/syncio
 
   proc lines(path: string): seq[string] = open(path).readAll.strip.split('\n')
