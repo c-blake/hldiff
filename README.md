@@ -32,11 +32,10 @@ fun micro-project. ;-) }
 
 After writing it, a secondary motivation emerged.  The core difflib part of this
 package is ~100x faster than the Python impl.  Applied to highlighting, this
-yields a useful trait.  Since `hldiff` is typically 2-7x faster than `git log
--p`, if you have >=1.5 free CPU cores (a common case for me) then `git log -p |
-hldiff` should take *no more real time* than `git log -p` (which can take an
-annoyingly long time itself).  I found no other package with a similar "no extra
-time" trait.
+yields a useful trait.  Since `hldiff` is typically 2-7x faster than unadorned
+`git log -p`, if you have >=1.5 free CPU cores (common for me) then `git log -p
+| hldiff` takes *no more real time* than `git log -p` (which can take a long
+time itself).  I found no other package with a similar "no extra time" trait.
 
 Assuming 2 free CPU cores, such a program would need to be no more than 2x
 slower than `hldiff`.  E.g., Perl `diff-so-fancy` is 9..12x slower.  Meanwhile
@@ -72,7 +71,7 @@ highlights of substitution hunks.  For the above 3 e.g.s times become 3.5,
 First compile it (`git clone <CLIGEN>`, `git clone <THIS>`, and then
 `nim c --path:to/cligen --gc:orc -d:danger hldiff`.  Alternatively, you can
 `nimble install hldiff`).  A profile-guided optimization (PGO) build is a
-user-exercise but only about 10% faster in this case.
+user-exercise but only about 10% faster in my testing.
 
 Then to `$HOME/.config/hg/hgrc` add
 ```
