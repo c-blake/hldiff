@@ -91,7 +91,9 @@ repository, I get:
 ```sh
 diff -u a b | hldiff
 ```
-producing [this output](egOut.png).
+producing this output:
+
+![screenshot](https://raw.githubusercontent.com/c-blake/hldiff/master/egOut.png)
 
 You will also want to `cp example.cf $HOME/.config/hldiff` and edit it to your
 liking.  ANSI SGR escape names are the usual suspects from `cligen/humanUt.nim`:
