@@ -1,7 +1,7 @@
 ## Module to get edits across two `openArray[T]` where `T` has `hash` & `==`.
 ## Algorithm is Python's `difflib.SequenceMatcher` follow-on to Ratcliff1988's
 ## edit distance with run time ~ `[o(n), O(n^2)]` where `n = max(s.len, t.len)`.
-
+{.warning[Uninit]:off, warning[ProveInit]:off.} # Should be verbosity:2 not 1
 import std/[tables, algorithm, sets, sequtils, heapqueue], adix/lptabz
 
 type
