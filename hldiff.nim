@@ -1,7 +1,6 @@
 import std/[strutils, os, sets, tables], hldiffpkg/edits,
        cligen/[parseopt3, sysUt, osUt, textUt, humanUt]
 when not declared(stdin): import std/syncio
-{.warning[Uninit]:off, warning[ProveInit]:off.} # Should be verbosity:2 not 1
 var
   highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
     "regular"           : "plain"      ,
@@ -22,6 +21,7 @@ var
   thresh = 30                   # Similarity threshold to do char-by-char diff
   junks: HashSet[char]          # Use Python difflib-like junk heuristic
   bskip  = 20                   # Do not char-by-char block pairs > bskip*bskip
+
 var pt: seq[string]             # Current (p)ar(t)/section being highlighted
 
 template emit(a: varargs[string, `$`]) = outu(a)
