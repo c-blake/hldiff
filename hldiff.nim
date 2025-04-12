@@ -30,14 +30,11 @@ proc parseColor(color: seq[string], plain=false) =
   let plain = plain or existsEnv("NO_COLOR")
   for spec in color:
     let cols = spec.strip.splitWhitespace(1)
-    if cols.len < 2:
-      raise newException(ValueError, "bad color line: \"" & spec & "\"")
+    if cols.len < 2: Value !! "bad color line: \"" & spec & "\""
     let key = cols[0].optionNormalize
-    if key notin highlights:
-      raise newException(ValueError, "unknown color key: \"" & spec & "\"")
+    if key notin highlights: Value !! "unknown color key: \"" & spec & "\""
     highlights[key] = cols[1]
-  for k, v in highlights:
-    attr[k] = textAttrOn(v.split, plain)
+  for k, v in highlights: attr[k] = textAttr(v, plain)
   hlReg         = attr["regular"]
   hlCommitHdNm  = attr["commitheadername"]
   hlCommitHdVal = attr["commitheadervalue"]
@@ -173,8 +170,7 @@ proc rendDiffHunk() =
   var a = 1; var b = 0
   var nDel = 0
   for i in 1 ..< pt.len:
-    if pt[i].len < 1:
-      raise newException(ValueError, "malformatted diff")
+    if pt[i].len < 1: Value !! "malformatted diff"
     let c = pt[i][0]
     if (state == ekEql and c in sb) or (state == ekDel and c == '-') or
        (c == '+' and state in {ekIns, ekSub}):  # any->self: accumulate
