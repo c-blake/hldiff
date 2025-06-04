@@ -174,13 +174,12 @@ when isMainModule:
 
   proc hldiff(color: seq[string] = @[], colors: seq[string] = @[], plain=false,
               simThresh=30, dHdLikeEdit=true, junk=false, blockSkip=20) =
-    ## This is a stdin/stdout filter to (re-)highlight unidiff output, e.g.
-    ## ``git log -p``, ``hg log -p``, or ``diff -ru A/ B/`` with intra-line
-    ## character-by-character deltas.  Highlightble syntax elements are:
-    ##   regular, commitHeaderName, commitHeaderValue, commitMessage,
-    ##   diffHeader, hunkHeader,
-    ##   equal, deleted, deletedEmph, inserted, insertedEmph
-    ## Use in ``--color`` is case/style/kebab-insensitive.
+    ## is a stdin/stdout filter to (re-)highlight unidiff output { `diff -ru A
+    ## B`, `git log -p`, `hg log -p`, , .. } emphasizing intra-line char-by-char
+    ## edits.  Case/style/kebab-insensitive syntax elements for `--color` are:
+    ##   commitHeaderName commitHeaderValue commitMessage
+    ##   diffHeader hunkHeader
+    ##   equal deleted deletedEmph inserted insertedEmph regular
     thresh = simThresh  # Copy CL params into global vars
     dhl    = dHdLikeEdit
     junks  = if junk: @[ ' ', '\t' ].toHashSet else: initHashSet[char]()
