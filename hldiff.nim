@@ -1,51 +1,60 @@
+when not declared(stdin): import std/syncio
 import std/[strutils, os, sets, tables], hldiffpkg/edits,
        cligen/[parseopt3, sysUt, osUt, textUt, humanUt]
-when not declared(stdin): import std/syncio
-var
-  highlights = { #key lower for optionNormalize camelCase kebab-case snake_case
-    "regular"           : "plain"      ,
-    "commitheadername"  : "blue"       ,
-    "commitheadervalue" : "purple"     ,
-    "commitmessage"     : "cyan"       ,
-    "diffheader"        : "yellow"     ,
-    "hunkheader"        : "white"      ,
-    "equal"             : "NONE"       ,
-    "deleted"           : "red"        ,
-    "deletedemph"       : "red inverse",
-    "inserted"          : "green"      ,
-    "insertedemph"      : "green inverse" }.toTable
-  attr: Table[string, string]   # Above table realized post-start up/parseColor
-  hlReg, hlCommitHdNm, hlCommitHdVal, hlCommitMsg, hlDiffHdr, hlHunkHdr,
-    hlEql, hlDel, hlDelEmph, hlIns, hlInsEmph: string #No-lookup access to above
-  dhl    = false                # Highlight diff header ---/+++ lines like edits
-  thresh = 30                   # Similarity threshold to do char-by-char diff
-  junks: HashSet[char]          # Use Python difflib-like junk heuristic
-  bskip  = 20                   # Do not char-by-char block pairs > bskip*bskip
+
+type PartKind = enum pkCommitHd, pkDiffHd, pkDiffHunk
 
 var pt: seq[string]             # Current (p)ar(t)/section being highlighted
+
+iterator stdinParts: PartKind = # Classify lines & maintain global `pt[]`
+  var state = pkCommitHd                #NOTE: empty `pkCommitHd` is @start|end
+  for raw in stdin.lines:               #.. of `diff -ru`|mercurial inputs.
+    let ln = raw.stripSGR               # lines() already strips either \r\n|\n
+    if state == pkDiffHd and ln.startsWith("+++"):
+      pt.add ln; yield state; pt.setLen 0
+      state = pkDiffHunk
+    elif state != pkDiffHd and (ln.startsWith("diff") or ln.startsWith("---")):
+      yield state; pt = @[ ln ]         # yield whatever we have & switch
+      state = pkDiffHd                  #..to accumulating diff header
+    elif pt.len > 0 and ln.startsWith("@@"):
+      yield state; pt = @[ ln ]         # New hunk; yield & reset
+    elif ln.len == 0:                   # one+ pure blanks re-enters commit hdr
+      yield state; pt = @[ ln ]
+      state = pkCommitHd
+    else: pt.add ln                     # non-blank; accumulate
+  yield state
+
+var
+  hlReg, hlCommitHdNm, hlCommitHdVal, hlCommitMsg, hlDiffHdr, hlHunkHdr,
+    hlEql, hlDel, hlDelEmph, hlIns, hlInsEmph: string # No-lookup access
+  thresh = 30                   # Similarity threshold to do char-by-char diff
+  dhl    = false                # Highlight diff header ---/+++ lines like edits
+  junks: HashSet[char]          # Use Python difflib-like junk heuristic
+  bskip  = 20                   # Do not char-by-char block pairs > bskip*bskip
 
 template emit(a: varargs[string, `$`]) = outu(a)
 
 proc parseColor(color: seq[string], plain=false) =
+  var highlights = { # optionNormalize: camelCase kebab-case snake_case->lower
+    "regular"           : ("plain"        , addr hlReg        ),
+    "commitheadername"  : ("blue"         , addr hlCommitHdNm ),
+    "commitheadervalue" : ("purple"       , addr hlCommitHdVal),
+    "commitmessage"     : ("cyan"         , addr hlCommitMsg  ),
+    "diffheader"        : ("yellow"       , addr hlDiffHdr    ),
+    "hunkheader"        : ("white"        , addr hlHunkHdr    ),
+    "equal"             : ("NONE"         , addr hlEql        ),
+    "deleted"           : ("red"          , addr hlDel        ),
+    "deletedemph"       : ("red inverse"  , addr hlDelEmph    ),
+    "inserted"          : ("green"        , addr hlIns        ),
+    "insertedemph"      : ("green inverse", addr hlInsEmph    )}.toTable
   let plain = plain or existsEnv("NO_COLOR")
   for spec in color:
     let cols = spec.strip.splitWhitespace(1)
     if cols.len < 2: Value !! "bad color line: \"" & spec & "\""
     let key = cols[0].optionNormalize
     if key notin highlights: Value !! "unknown color key: \"" & spec & "\""
-    highlights[key] = cols[1]
-  for k, v in highlights: attr[k] = textAttr(v, plain)
-  hlReg         = attr["regular"]
-  hlCommitHdNm  = attr["commitheadername"]
-  hlCommitHdVal = attr["commitheadervalue"]
-  hlCommitMsg   = attr["commitmessage"]
-  hlDiffHdr     = attr["diffheader"]
-  hlHunkHdr     = attr["hunkheader"]
-  hlEql         = attr["equal"]
-  hlDel         = attr["deleted"]
-  hlDelEmph     = attr["deletedemph"]
-  hlIns         = attr["inserted"]
-  hlInsEmph     = attr["insertedemph"]
+    highlights[key][0] = cols[1]
+  for k, v in highlights: v[1][] = textAttr(v[0], plain)
 
 proc isHeader(ln: string): bool {.inline.} =    # Check [A-Za-z]+:<WHITESPC>
   var sawLetter = false
@@ -134,37 +143,8 @@ proc render(a, b: int; ek: EdKind, nDel: int) {.inline.} =
   of ekIns: (for i in a..b: emit hlIns, pt[i], hlReg, '\n')
   of ekSub: rendSub a, b, nDel
 
-type PartKind = enum pkCommitHd, pkDiffHd, pkDiffHunk
-
-iterator stdinParts(): PartKind =
-  ## A fast, one-pass iterator to classify input lines into blocks.  Note that
-  ## an empty ``pkCommitHd`` occurs @start|end of ``diff -ru``|mercurial inputs.
-  var state = pkCommitHd
-  for raw in stdin.lines:               #NOTE: this strips either \r\n or \n
-    let ln = raw.stripSGR
-    if state == pkDiffHd and ln.startsWith("+++"):
-      pt.add ln
-      yield state
-      pt.setLen 0
-      state = pkDiffHunk
-    elif state != pkDiffHd and (ln.startsWith("diff") or ln.startsWith("---")):
-      yield state                       # yield whatever we have & switch
-      pt = @[ ln ]
-      state = pkDiffHd                  #..to accumulating diff header
-    elif pt.len > 0 and ln.startsWith("@@"):
-      yield state                       # New hunk; yield & reset
-      pt = @[ ln ]
-    elif ln.len == 0:                   # one+ pure blanks re-enters commit hdr
-      yield state
-      pt = @[ ln ]
-      state = pkCommitHd
-    else:                               # non-blank; accumulate
-      pt.add ln
-  yield state
-
-const sb = { ' ', '\\' }  # Mercurial emits "^\ No newline at end of file"
-proc rendDiffHunk() =
-  ## Fancy intra-line diff highlighting of edit hunks.
+const sb = {' ', '\\'}  # Mercurial emits "^\ No newline at end of file"
+proc rendDiffHunk() =   # Fancy intra-line diff highlighting of edit hunks.
   emit hlHunkHdr, pt[0], hlReg, '\n'    # render "@@" hunk header line.
   var state = ekEql
   var a = 1; var b = 0
@@ -201,7 +181,7 @@ when isMainModule:
     ##   diffHeader, hunkHeader,
     ##   equal, deleted, deletedEmph, inserted, insertedEmph
     ## Use in ``--color`` is case/style/kebab-insensitive.
-    thresh = simThresh
+    thresh = simThresh  # Copy CL params into global vars
     dhl    = dHdLikeEdit
     junks  = if junk: @[ ' ', '\t' ].toHashSet else: initHashSet[char]()
     bskip  = blockSkip
@@ -213,11 +193,11 @@ when isMainModule:
       of pkDiffHd:   rendDiffHd()
       of pkDiffHunk: rendDiffHunk()
 
-  dispatch(hldiff, help = {
+  dispatch hldiff, help = {
              "colors"      : "color aliases; Syntax: name = ATTR1 ATTR2..",
              "color"       : "text attrs for syntax elts; Like lc/etc.",
              "plain"       : "turn off ANSI SGR escape colorization",
              "blockSkip"   : "do not char-by-char block pairs > this",
              "simThresh"   : "do not char-by-char less similar than this",
              "dHdLikeEdit" : "colorize diff header ---/+++ like edits",
-             "junk"        : "apply Py difflib junk heuristic intra-line" })
+             "junk"        : "apply Py difflib junk heuristic intra-line" }
