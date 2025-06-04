@@ -95,12 +95,14 @@ producing this output:
 ![screenshot](https://raw.githubusercontent.com/c-blake/hldiff/master/egOut.png)
 
 You will also want to `cp example.cf $HOME/.config/hldiff` and edit it to your
-liking.  ANSI SGR escape names are the usual suspects from `cligen/humanUt.nim`:
+liking.  ANSI SGR escape names are the usual suspects from
+[`cligen/humanUt.nim`](https://github.com/c-blake/cligen/blob/master/cligen/humanUt.nim):
 ```
-plain, bold, italic, underline, blink, inverse, struck, NONE,
-black, red, green, yellow, blue, purple, cyan, white;
-UPPERCASE =>HIGH intensity; "on_" prefix => BACKGROUND color
-256-color attrs are [fb][0..23] for FORE/BACK grey scl & [fb]RGB
-a 6x6x6 color cube; each [RGB] is on [0,5].
-xterm/st/kitty/alacritty true color: [fb]HHHHHH (usual RGB order).
+ILK bold italic blink inverse hid struck under{line double curl dot dash} over
+Same w/leading '-': turn JUST THAT off; plain NONE none off: turn ALL off
+Basic Color: black red green yellow blue purple cyan white; -fg/-bg turn OFF
+UPPERCASE => HIGH intensity; "on_" prefix => BACKGROUND color;
+xterm256: {fbu}(0-23|0-50-50-5) for F)ORE B)ACKgrnd U)NDER (greyLevel|6cube);
+True color: {fbu}RRGGBB with RGB hex digits.
+{fbu}sNAME<0.-1>[,..]: element of NAME: viridis hue[,s,v] wLen[,s,v] gray pm3d
 ```
